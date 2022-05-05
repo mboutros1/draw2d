@@ -66,7 +66,8 @@ draw2d.layout.connection.ConnectionRouter = Class.extend(
         lastP = p
       }
       p = ps.get(i)
-      path.push("L", adjust(p.x), ",", adjust(p.y))
+      if (p)
+        path.push("L", adjust(p.x), ",", adjust(p.y))
     }
     else {
       length = ps.getSize()

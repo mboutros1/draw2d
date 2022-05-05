@@ -166,7 +166,7 @@ draw2d.Canvas = Class.extend(
       this.mouseDownY = 0
       this.mouseDragDiffX = 0
       this.mouseDragDiffY = 0
-
+      this.setupClickEvents();
       this.html.bind("mouseup touchend", function (event) {
         if (_this.mouseDown === false) {
           return
@@ -226,9 +226,7 @@ draw2d.Canvas = Class.extend(
         } else {
           let diffXAbs = (event.clientX - _this.mouseDownX) * _this.zoomFactor
           let diffYAbs = (event.clientY - _this.mouseDownY) * _this.zoomFactor
-          _this.editPolicy.each(function (i, policy) {
-            policy.onMouseDrag(_this, diffXAbs, diffYAbs, diffXAbs - _this.mouseDragDiffX, diffYAbs - _this.mouseDragDiffY, event.shiftKey, event.ctrlKey)
-          })
+          _this.raiseMouseDrag ( diffXAbs, diffYAbs, pos,event);
           _this.mouseDragDiffX = diffXAbs
           _this.mouseDragDiffY = diffYAbs
           _this.fireEvent("mousemove", {
@@ -240,7 +238,10 @@ draw2d.Canvas = Class.extend(
           })
         }
       })
-
+      this.setupMouseDownEvents();
+    },
+    setupMouseDownEvents:function(){
+      var _this = this;
       this.html.bind("mousedown", function (event) {
         try {
           let pos = null
@@ -281,7 +282,9 @@ draw2d.Canvas = Class.extend(
           console.log(exc)
         }
       })
-
+    },
+    setupClickEvents:function(){
+        var _this = this;
 
       // Catch the dblclick and route them to the Canvas hook.
       //
@@ -307,7 +310,10 @@ draw2d.Canvas = Class.extend(
           _this.onClick(pos.x, pos.y, event.shiftKey, event.ctrlKey)
         }
       })
-
+      this.setupScrollEvents();
+    },
+    setupScrollEvents:function(){
+        var _this = this;
       // Important: MozMousePixelScroll is required to prevent 1px scrolling
       // in FF event if we call "e.preventDefault()"
       this.html.on('MozMousePixelScroll DOMMouseScroll mousewheel', function (e) {
@@ -362,6 +368,12 @@ draw2d.Canvas = Class.extend(
 
     },
 
+    raiseMouseDrag:function( diffXAbs, diffYAbs, pos, event){ 
+			_this = this;
+	       this.editPolicy.each(function(i, policy) {
+	            policy.onMouseDrag(_this, diffXAbs, diffYAbs, diffXAbs - _this.mouseDragDiffX, diffYAbs - _this.mouseDragDiffY, event.shiftKey, event.ctrlKey);
+	        }); 
+	  },
     /**
      *
      * Call this method if you didn't need the canvas anymore. The method unregister all even handlers

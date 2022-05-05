@@ -40,8 +40,12 @@ draw2d.command.CommandReconnect = draw2d.command.Command.extend(
    * @returns {Boolean}
    **/
   canExecute: function () {
-    // return false if we doesn't modify the model => NOP Command
-    return true
+    var canExe = this.newTargetPort instanceof draw2d.Port && this.newSourcePort instanceof draw2d.Port;
+    if(!canExe) {
+        this.con.repaint(); 
+        this.con.reconnect(); 
+    }
+    return canExe;
   },
 
   /**
